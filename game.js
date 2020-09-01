@@ -21,24 +21,24 @@ var game = new Phaser.Game(config);
 var player, walk, platforms, tele, jump, fall, finish
 
 function preload(){
-  this.cameras.main.setBounds(-50, 0, 2200, 500);
+  this.cameras.main.setBounds(0, 0, 2200, 500);
 
   this.physics.world.setBounds(-50, -200, 2200, 900);
 
-  this.load.image('sky', 'assets/sky.png')
+  this.load.image('sky', 'assets/testBack.png')
   this.load.image('clouds', 'assets/clouds.png')
   this.load.image('ground', 'assets/road.png')
   this.load.image('grass2', 'assets/grass2.png')
   this.load.image('grass', 'assets/ground.png')
   this.load.image('tree', 'assets/tree.png')
-  this.load.image('platform', 'assets/rectangle.png')
+  this.load.image('platform', 'assets/metalBox.png')
   this.load.image('tele', 'assets/tele.png')
-  this.load.spritesheet('player', 'assets/dude.png',{ frameWidth: 32, frameHeight: 48})
+  this.load.spritesheet('player', 'assets/mydood.png',{ frameWidth: 32, frameHeight: 32})
 
   //Audio
-  this.load.audio('jump', './jump_03.wav')
-  this.load.audio('fall', './death.wav')
-  this.load.audio('finish', './round_end.wav')
+  this.load.audio('jump', './audio/jump_03.wav')
+  this.load.audio('fall', './audio/death.wav')
+  this.load.audio('finish', './audio/round_end.wav')
 
   //Arrow keys
   this.cursors = this.input.keyboard.createCursorKeys()
@@ -48,7 +48,8 @@ function preload(){
 function create(){
   
 
-  this.sky = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'sky').setOrigin(0,0).setScrollFactor(0)
+  // this.sky = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'sky').setOrigin(0,0).setScrollFactor(0)
+  this.sky = this.add.image(0,0, 'sky').setOrigin(0,0)
   this.add.image(0, 0, 'clouds')
   this.add.image(0, -50, 'tree').setOrigin(0,0)
   
@@ -68,19 +69,23 @@ function create(){
 
   platforms = this.physics.add.staticGroup();
   //Starting platform
-  platforms.create(-0, 500, 'platform')
+  platforms.create(40, 500, 'platform')
   //Other in order
-  platforms.create(200, 400, 'platform').setScale(2, 1).refreshBody()
-  platforms.create(500, 300, 'platform').setScale(2, 1).refreshBody()
+  platforms.create(220, 400, 'platform')
+  platforms.create(450, 300, 'platform')
   platforms.create(700, 200, 'platform')
   platforms.create(1000, 400, 'platform')
   platforms.create(1200, 300 , 'platform')
+
+//   //
+//   .setScale(2, 1).refreshBody()
+// .setScale(2, 1).refreshBody()
 
   tele = this.add.sprite(1600, 400, 'tele')
   this.physics.add.existing(tele, true) 
 
 
-  player = this.physics.add.sprite(0, 400, 'player').setScale(2)
+  player = this.physics.add.sprite(30, 400, 'player').setScale(2)
   player.setBounce(0.2);
   player.setCollideWorldBounds(true);
   
@@ -90,20 +95,20 @@ function create(){
   //Create Animations
   this.anims.create({
     key: 'left',
-    frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+    frames: this.anims.generateFrameNumbers('player', { start: 4, end: 6 }),
     frameRate: 10,
     repeat: -1
   });
 
   this.anims.create({
     key: 'turn',
-    frames: [ { key: 'player', frame: 4 } ],
+    frames: [ { key: 'player', frame: 7 } ],
     frameRate: 20
   });
 
   this.anims.create({
     key: 'right',
-    frames: this.anims.generateFrameNumbers('player', { start: 5, end: 8 }),
+    frames: this.anims.generateFrameNumbers('player', { start: 1, end: 3 }),
     frameRate: 10,
     repeat: -1
   });
@@ -168,7 +173,7 @@ function update(){
   }
   if(player.y >= 550) {
     fall.play()
-    player.setX(0)
+    player.setX(30)
     player.setY(300)
   }
 
