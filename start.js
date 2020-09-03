@@ -1,5 +1,5 @@
 
-  var player, walk, platforms, tele, jump, fall, finish
+  var player, walk, platforms, tele, jump, fall, finish, platformArray
 
   class start extends Phaser.Scene{
       constructor() {
@@ -14,9 +14,6 @@
     this.physics.world.setBounds(0, -200, 2200, 900);
   
     this.load.image('sky', 'assets/prettySky.png')
-    // this.load.image('clouds', 'assets/clouds.png')
-    // this.load.image('ground', 'assets/road.png')
-    // this.load.image('grass2', 'assets/myGrass.png')
     this.load.image('grass', 'assets/purpleGrass.png')
     this.load.image('tree', 'assets/tTree.png')
     this.load.image('platform', 'assets/metalBox.png')
@@ -37,32 +34,47 @@
     
   
     // this.sky = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'sky').setOrigin(0,0).setScrollFactor(0)
-    this.sky = this.add.image(0,-50, 'sky').setOrigin(0,0)
-    this.sky = this.add.image(800,-50, 'sky').setOrigin(0,0)
-    this.sky = this.add.image(1500,-50, 'sky').setOrigin(0,0)
-    // this.add.image(0, 0, 'clouds')
-    // this.add.image(0, 5, 'tree').setOrigin(0,0)
+    // this.sky = this.add.image(0,-50, 'sky').setOrigin(0,0)
+    this.sky = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'sky').setOrigin(0, 0).setScrollFactor(0)
     
     
     //Tilesprite and scroll factor allows repeating scrolling background
     this.tree = this.add.tileSprite(0, 30, game.config.width, game.config.height, 'tree').setOrigin(0, 0).setScrollFactor(0)
 
+    // this.grass = this.add.tileSprite(0, 30, game.config.width, 200, 'grass').setOrigin(0, 0).setScrollFactor(0)
+
     
     this.add.image(0,600,'grass')
     this.add.image(600,600,'grass')
     this.add.image(1200,600,'grass')
-    // this.grass2 = this.add.tileSprite(0, 400, game.config.width, 200, 'grass2').setOrigin(0, 0).setScrollFactor(2)
-    // this.grass2 = this.add.tileSprite(0, 400, game.config.width, 200, 'grass2').setOrigin(0, 0).setScrollFactor(2)
     
     //Add scrolling ground but give it physics
-    // ground = this.add.tileSprite(0, 500, game.config.width, 200, 'ground').setOrigin(0, 0).setScrollFactor(0)
     //Add ground to physics system, default value is false which means dynamic value, setting true makes it static and does not react to forces therefore setting gravity is no longer needed, keeping for reference
     // this.physics.add.existing(ground, true)
     //Remove gravity so it stays in place
     // ground.body.setAllowGravity(false)
   
   
-    platforms = this.physics.add.staticGroup();
+    // platforms = this.physics.add.staticGroup();
+    // //Starting platform
+    // platforms.create(40, 500, 'platform')
+    // //Other in order
+    // platforms.create(220, 400, 'platform')
+    // platforms.create(450, 300, 'platform')
+    // platforms.create(650, 200, 'platform')
+    // platforms.create(1000, 400, 'platform')
+    // // platforms.create(1200, 300 , 'platform')
+    
+    // var movingPlatform = this.physics.add.sprite(1200, 300, 'platform')
+    // movingPlatform.body.allowGravity = false;
+    // movingPlatform.body.immovable = true;
+    // movingPlatform.body.moves = false;
+
+    // // platforms.children.entries[1]
+
+    
+
+    platforms = this.physics.add.group();
     //Starting platform
     platforms.create(40, 500, 'platform')
     //Other in order
@@ -71,14 +83,54 @@
     platforms.create(650, 200, 'platform')
     platforms.create(1000, 400, 'platform')
     platforms.create(1200, 300 , 'platform')
-  
-  //   //
-  //   .setScale(2, 1).refreshBody()
-  // .setScale(2, 1).refreshBody()
+
+    var platformArray = platforms.getChildren()
+
+    for (let i = 0; i < platformArray.length; i++){
+      platformArray[i].body.allowGravity = false
+      platformArray[i].body.immovable = true
+    }
+
+    // platformArray[1].body.setVelocityX(10)
+    
+    var timeline1 = this.tweens.timeline({
+
+      targets: platformArray[2],
+      loop: -1,
+
+      tweens: [
+      {
+          x: 500,
+          ease: 'Linear',
+          duration: 1000,
+          yoyo: true,
+         
+      },
+      ]
+      
+    })
+
+    var timeline2 = this.tweens.timeline({
+
+      targets: platformArray[5],
+      loop: -1,
+
+      tweens: [
+      {
+          x: 1000,
+          ease: 'Linear',
+          duration: 1000,
+          yoyo: true,
+         
+      },
+      ]
+      
+    })
+
+    
   
     tele = this.add.sprite(1550, 400, 'tele')
     this.physics.add.existing(tele, true) 
-  
   
     player = this.physics.add.sprite(30, 400, 'player')
     player.setBounce(0.2)
@@ -92,6 +144,7 @@
     
     this.physics.add.collider(player, platforms)
     this.physics.add.overlap(player, tele, win)
+    // this.physics.add.collider(player, movingPlatform)
   
     //Create Animations
     this.anims.create({
@@ -133,6 +186,7 @@
     //Debug
     console.log(player)
     console.log(this.physics.world)
+    console.log(platforms)
     
   }
   
@@ -141,6 +195,11 @@
    update(){
    
     const speed = 300
+
+
+    // if(player.body.touching.down = true){
+    //   player.setVelocityX(platformArray[1].body.velocity.x)
+    // }
   
     //Move left
     if(this.cursors.left.isDown && player.x > -500){
@@ -153,7 +212,7 @@
       player.play('right', true)
     }
     //Move up
-    if(this.cursors.up.isDown | this.keySpace.isDown && player.body.onFloor()){
+    if(this.cursors.up.isDown | this.keySpace.isDown && (player.body.touching.down == true)){
       player.setVelocityY(-700)
       jump.play()
       
@@ -183,7 +242,7 @@
   
     //Camera stuff
     this.cameras.main.startFollow(player)
-    // this.sky.tilePositionX = this.cameras.main.scrollX * 0.3
+    this.sky.tilePositionX = this.cameras.main.scrollX * 0.3
     this.tree.tilePositionX = this.cameras.main.scrollX * 0.5
   
     
